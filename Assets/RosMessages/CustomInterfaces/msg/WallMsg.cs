@@ -13,22 +13,22 @@ namespace RosMessageTypes.CustomInterfaces
         public const string k_RosMessageName = "custom_interfaces/Wall";
         public override string RosMessageName => k_RosMessageName;
 
-        public int id;
+        public string name;
         public Geometry.Vector3Msg position;
         public Geometry.Vector3Msg rotation;
         public Geometry.Vector3Msg scale;
 
         public WallMsg()
         {
-            this.id = 0;
+            this.name = "";
             this.position = new Geometry.Vector3Msg();
             this.rotation = new Geometry.Vector3Msg();
             this.scale = new Geometry.Vector3Msg();
         }
 
-        public WallMsg(int id, Geometry.Vector3Msg position, Geometry.Vector3Msg rotation, Geometry.Vector3Msg scale)
+        public WallMsg(string name, Geometry.Vector3Msg position, Geometry.Vector3Msg rotation, Geometry.Vector3Msg scale)
         {
-            this.id = id;
+            this.name = name;
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
@@ -38,7 +38,7 @@ namespace RosMessageTypes.CustomInterfaces
 
         private WallMsg(MessageDeserializer deserializer)
         {
-            deserializer.Read(out this.id);
+            deserializer.Read(out this.name);
             this.position = Geometry.Vector3Msg.Deserialize(deserializer);
             this.rotation = Geometry.Vector3Msg.Deserialize(deserializer);
             this.scale = Geometry.Vector3Msg.Deserialize(deserializer);
@@ -46,7 +46,7 @@ namespace RosMessageTypes.CustomInterfaces
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.id);
+            serializer.Write(this.name);
             serializer.Write(this.position);
             serializer.Write(this.rotation);
             serializer.Write(this.scale);
@@ -55,7 +55,7 @@ namespace RosMessageTypes.CustomInterfaces
         public override string ToString()
         {
             return "WallMsg: " +
-            "\nid: " + id.ToString() +
+            "\nname: " + name.ToString() +
             "\nposition: " + position.ToString() +
             "\nrotation: " + rotation.ToString() +
             "\nscale: " + scale.ToString();

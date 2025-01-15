@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,7 @@ public class DetectedObjectsManager : MonoBehaviour
 {
     public GameObject ImageTarget, ModelTarget;
     public static GameObject imageTarget;
+    public static GameObject modelTarget;
     public TextMeshPro text;
 
     void Start()
@@ -28,7 +30,7 @@ public class DetectedObjectsManager : MonoBehaviour
         imageTarget.transform.forward = -ImageTarget.transform.up;
         Vector3 globalPosition = ModelTarget.transform.position;
         Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
-        text.text = localPosition.ToString();
+        float y_angle = imageTarget.transform.eulerAngles.y - ModelTarget.transform.eulerAngles.y;
     }
 
 }
