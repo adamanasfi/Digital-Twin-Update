@@ -34,10 +34,10 @@ public class ROSPublisherManager : MonoBehaviour
         imageTarget.transform.forward = -ImageTarget.transform.up;
         Vector3 globalPosition = ModelTarget.transform.position;
         Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
-        float y_angle = imageTarget.transform.eulerAngles.y - ModelTarget.transform.eulerAngles.y;
+        float y_angle = ModelTarget.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
         husky.name = "husky";
-        husky.position = new RosMessageTypes.Geometry.Vector3Msg(localPosition.x, localPosition.z, localPosition.z);
-        husky.rotation = new RosMessageTypes.Geometry.Vector3Msg(0, 0, y_angle);
+        husky.position = new RosMessageTypes.Geometry.Vector3Msg(localPosition.x, localPosition.z, localPosition.y);
+        husky.rotation = new RosMessageTypes.Geometry.Vector3Msg(0, 0, -y_angle);
         husky.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/husky", husky);
     }
@@ -58,7 +58,7 @@ public class ROSPublisherManager : MonoBehaviour
             wall.scale = new RosMessageTypes.Geometry.Vector3Msg(child.transform.localScale.x, child.transform.localScale.z, child.transform.localScale.y);
             ros.Publish("/hololensWall", wall);
             count++;
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
