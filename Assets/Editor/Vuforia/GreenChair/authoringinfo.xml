@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<QCARInfo>
+    <TargetSet version="36.0" toolVersion="v7.1.1">
+        <ModelTarget name="GreenChair" targetId="0e19cfdfe3624022af30467b9b61ead8" version="14.0" toolVersion="v7.1.1" bbox="-0.386799 -0.000484 -0.375520 0.316018 0.991985 0.361688" trackingMode="scan" upVector="0.0 1.0 0.0" optimizeTrackingFor="default" realisticTextures="yes" />
+    </TargetSet>
+    <Assembly name="GreenChair" assemblyId="5e8236a0c8904f709eabcca2c50d7474">
+        <Part name="GreenChair" translation="0 0 0" rotation="AD: 0 0 1 0" />
+        <EntryPoint name="(none)" trained="yes" />
+    </Assembly>
+</QCARInfo>
