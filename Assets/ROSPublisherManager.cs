@@ -16,6 +16,7 @@ public class ROSPublisherManager : MonoBehaviour
     public GameObject vuforiaParent;
     RosMessageTypes.CustomInterfaces.WallMsg wall;
     RosMessageTypes.CustomInterfaces.WallMsg VRLAsset;
+    RosMessageTypes.Geometry.TwistMsg transformation;
 
     void Start()
     {
@@ -23,8 +24,35 @@ public class ROSPublisherManager : MonoBehaviour
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<RosMessageTypes.CustomInterfaces.WallMsg>("/hololensWall");
         ros.RegisterPublisher<RosMessageTypes.CustomInterfaces.WallMsg>("/assets");
+        ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
         wall = new RosMessageTypes.CustomInterfaces.WallMsg();
         VRLAsset = new RosMessageTypes.CustomInterfaces.WallMsg();
+        transformation = new RosMessageTypes.Geometry.TwistMsg();
+    }
+
+    private void CreateDebugCube(Vector3 position, Color color)
+    {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = position;
+        cube.transform.localScale = Vector3.one * 0.2f; // Set size to make it more visible
+        cube.GetComponent<Renderer>().material.color = color;
+    }
+
+    public void PublishTransform(GameObject robot)
+    {
+        Vector3 globalPosition = robot.transform.position;
+        Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
+        CreateDebugCube(robot.transform.position + robot.transform.forward * 1.0f, Color.blue);  // Forward (Z)
+        CreateDebugCube(robot.transform.position + robot.transform.up * 1.0f, Color.green);      // Up (Y)
+        CreateDebugCube(robot.transform.position + robot.transform.right * 1.0f, Color.red);     // Right (X)
+        float y_angle = imageTarget.transform.eulerAngles.y - robot.transform.eulerAngles.y;
+        transformation.linear.x = localPosition.x;
+        transformation.linear.y = localPosition.z;
+        transformation.linear.z = localPosition.y;
+        transformation.angular.x = 0;
+        transformation.angular.y = 0;
+        transformation.angular.z = y_angle;
+        ros.Publish("/transformation", transformation);
     }
 
     public void PublishActivatedModelTarget()
