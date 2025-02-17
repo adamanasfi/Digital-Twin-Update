@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.EnterpriseServices.Internal;
-using System.Security.Cryptography.Xml;
 using TMPro;
 using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
@@ -14,19 +13,19 @@ public class ROSPublisherManager : MonoBehaviour
     public GameObject ImageTarget;
     public static GameObject imageTarget;
     public GameObject vuforiaParent;
-    RosMessageTypes.CustomInterfaces.WallMsg wall;
-    RosMessageTypes.CustomInterfaces.WallMsg VRLAsset;
+    RosMessageTypes.CustomedInterfaces.WallMsg wall;
+    RosMessageTypes.CustomedInterfaces.WallMsg VRLAsset;
     RosMessageTypes.Geometry.TwistMsg transformation;
 
     void Start()
     {
         imageTarget = new GameObject("correctAxesImageTarget");
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<RosMessageTypes.CustomInterfaces.WallMsg>("/hololensWall");
-        ros.RegisterPublisher<RosMessageTypes.CustomInterfaces.WallMsg>("/assets");
+        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/hololensWall");
+        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/assets");
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
-        wall = new RosMessageTypes.CustomInterfaces.WallMsg();
-        VRLAsset = new RosMessageTypes.CustomInterfaces.WallMsg();
+        wall = new RosMessageTypes.CustomedInterfaces.WallMsg();
+        VRLAsset = new RosMessageTypes.CustomedInterfaces.WallMsg();
         transformation = new RosMessageTypes.Geometry.TwistMsg();
     }
 
