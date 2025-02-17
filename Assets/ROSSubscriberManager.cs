@@ -12,7 +12,7 @@ public class ROSSubscriberManager : MonoBehaviour
     ROSConnection ros;
     Dictionary<string, Dictionary<int,RosMessageTypes.CustomedInterfaces.ObjectMsg>> objectLocationsDict;
     Dictionary<string, Dictionary<int, GameObject>> toolTipsDict;
-    Dictionary<string, RosMessageTypes.CustomedInterfaces.TempMsg> tempCountsDict;
+    Dictionary<string, int> tempCountsDict;
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
@@ -20,6 +20,7 @@ public class ROSSubscriberManager : MonoBehaviour
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempCount", tempCountsCallback);
         objectLocationsDict = new Dictionary<string, Dictionary<int, RosMessageTypes.CustomedInterfaces.ObjectMsg>>();
         toolTipsDict = new Dictionary<string,Dictionary<int, GameObject>>();
+        tempCountsDict = new Dictionary<string, int>();
     }
 
     public void objectLocationsCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
@@ -47,7 +48,16 @@ public class ROSSubscriberManager : MonoBehaviour
 
     public void tempCountsCallback(RosMessageTypes.CustomedInterfaces.TempMsg tempMsg)
     {
-        
+        if (!tempCountsDict.ContainsKey(tempMsg.name)) tempCountsDict.Add(tempMsg.name, tempMsg.number); // class doesn't exist in dictionary 
+        else tempCountsDict[tempMsg.name] = tempMsg.number;
+        if (tempMsg.number == 0)
+        {         
+            foreach (GameObject tooltip in toolTipsDict[tempMsg.name].Values)
+            {
+                Destroy(tooltip);
+            }
+            toolTipsDict[tempMsg.name].Clear();
+        }
     }
 
     private void AddToolTip(string name, int id, bool updating = false) // updating boolean for saving compute
