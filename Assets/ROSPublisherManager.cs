@@ -4,6 +4,8 @@ using System.EnterpriseServices.Internal;
 using TMPro;
 using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.UI;
+
 
 public class ROSPublisherManager : MonoBehaviour
 {
@@ -24,9 +26,21 @@ public class ROSPublisherManager : MonoBehaviour
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/hololensWall");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/assets");
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
+        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempResponse");
         wall = new RosMessageTypes.CustomedInterfaces.WallMsg();
         VRLAsset = new RosMessageTypes.CustomedInterfaces.WallMsg();
         transformation = new RosMessageTypes.Geometry.TwistMsg();
+    }
+
+    public void publishOfflineObject(GameObject tooltip)
+    {
+        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
+        string text = tooltipText.ToolTipText;
+        string[] parts = text.Split('_');
+        string className = parts[0];
+        int number = int.Parse(parts[1]);
+        RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className,number);
+        ros.Publish("/tempResponse", tempMsg);
     }
 
     private void CreateDebugCube(Vector3 position, Color color)
