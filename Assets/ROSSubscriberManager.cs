@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.VisualScripting;
 using Microsoft.MixedReality.Toolkit.UI;
+using Vuforia;
 
 
 public class ROSSubscriberManager : MonoBehaviour
@@ -25,6 +26,7 @@ public class ROSSubscriberManager : MonoBehaviour
 
     public void objectLocationsCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
     {
+        Debug.Log("received ID: " + objectMsg.id);
         if (!objectLocationsDict.ContainsKey(objectMsg.name)) // class not in dictionary yet
         {
             objectLocationsDict.Add(objectMsg.name,new Dictionary<int,RosMessageTypes.CustomedInterfaces.ObjectMsg>());
@@ -44,7 +46,11 @@ public class ROSSubscriberManager : MonoBehaviour
         }
         if (tempCountsDict.ContainsKey(objectMsg.name))
         {
-            if (tempCountsDict[objectMsg.name] != 0) AddToolTip(objectMsg.name, objectMsg.id);
+            if (tempCountsDict[objectMsg.name] != 0)
+            {
+                Debug.Log("Temp Count is: " + tempCountsDict[objectMsg.name]);
+                AddToolTip(objectMsg.name, objectMsg.id);
+            }
         } 
     }
 
@@ -65,7 +71,7 @@ public class ROSSubscriberManager : MonoBehaviour
     private void AddToolTip(string name, int id) // updating boolean for saving compute
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = objectLocationsDict[name][id];
-        Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.y, (float)objectMsg.pose.position.z);
+        Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z + 1, (float)objectMsg.pose.position.y);
         Vector3 worldPosition = ROSPublisherManager.imageTarget.transform.TransformPoint(localPosition);
         GameObject tooltip = Instantiate(toolTipPrefab, worldPosition, Quaternion.identity);
         tooltip.SetActive(true);

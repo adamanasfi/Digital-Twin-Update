@@ -27,6 +27,7 @@ public class ROSPublisherManager : MonoBehaviour
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/assets");
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempResponse");
+        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensObject");
         wall = new RosMessageTypes.CustomedInterfaces.WallMsg();
         VRLAsset = new RosMessageTypes.CustomedInterfaces.WallMsg();
         transformation = new RosMessageTypes.Geometry.TwistMsg();
@@ -94,11 +95,13 @@ public class ROSPublisherManager : MonoBehaviour
         Vector3 globalPosition = asset.transform.position;
         Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
         float y_angle = asset.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
-        VRLAsset.name = asset.name.ToString();
-        VRLAsset.position = new RosMessageTypes.Geometry.Vector3Msg(localPosition.x, localPosition.z, localPosition.y);
-        VRLAsset.rotation = new RosMessageTypes.Geometry.Vector3Msg(0, 0, -y_angle);
-        VRLAsset.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
-        ros.Publish("/assets", VRLAsset);
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        objectMsg.name = asset.name.ToString();
+        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
+        Quaternion rotation = Quaternion.Euler(0, 0, -y_angle);
+        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
+        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
+        ros.Publish("/hololensObject", objectMsg);
     }
 
     public void PublishWalls()
