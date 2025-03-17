@@ -5,20 +5,22 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.VisualScripting;
 using Microsoft.MixedReality.Toolkit.UI;
 using Vuforia;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 
 public class ROSSubscriberManager : MonoBehaviour
 {
-    public GameObject toolTipPrefab;
     ROSConnection ros;
     public static Dictionary<string, Dictionary<int,RosMessageTypes.CustomedInterfaces.ObjectMsg>> objectLocationsDict;
     public static Dictionary<string, Dictionary<int, GameObject>> toolTipsDict;
     public static Dictionary<string, int> tempCountsDict;
+
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/objectLocations", objectLocationsCallback);
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempCount", tempCountsCallback);
+        ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/STOD", STODCallback);
         objectLocationsDict = new Dictionary<string, Dictionary<int, RosMessageTypes.CustomedInterfaces.ObjectMsg>>();
         toolTipsDict = new Dictionary<string,Dictionary<int, GameObject>>();
         tempCountsDict = new Dictionary<string, int>();
@@ -68,12 +70,12 @@ public class ROSSubscriberManager : MonoBehaviour
         }
     }
 
-    private void AddToolTip(string name, int id) // updating boolean for saving compute
+    private void AddToolTip(string name, int id) 
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = objectLocationsDict[name][id];
         Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z + 1, (float)objectMsg.pose.position.y);
         Vector3 worldPosition = ROSPublisherManager.imageTarget.transform.TransformPoint(localPosition);
-        GameObject tooltip = Instantiate(toolTipPrefab, worldPosition, Quaternion.identity);
+        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPosition, Quaternion.identity);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         tooltipText.ToolTipText = name + "_" + id.ToString();
@@ -87,6 +89,27 @@ public class ROSSubscriberManager : MonoBehaviour
             Destroy(toolTipsDict[name][id]);
             toolTipsDict[name][id] = tooltip;
         }  
+    }
+
+
+    public void STODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
+    {
+        GameObject prefab = PrefabsManager.prefabDictionary[objectMsg.name];
+        Vector3 localPose = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
+        Vector3 worldPose = ROSPublisherManager.imageTarget.transform.TransformPoint(localPose);
+        Quaternion receivedRotation = new Quaternion(
+            (float)objectMsg.pose.orientation.x,
+            (float)objectMsg.pose.orientation.y,
+            (float)objectMsg.pose.orientation.z,
+            (float)objectMsg.pose.orientation.w
+        );
+        Vector3 eulerRotation = receivedRotation.eulerAngles;
+        Quaternion adjustedRotation = Quaternion.Euler(eulerRotation.x, eulerRotation.z, eulerRotation.y);
+        GameObject assetCAD = Instantiate(prefab, worldPose, adjustedRotation, PrefabsManager.STODParent.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPose + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
+        tooltip.SetActive(true);
+        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
+        tooltipText.ToolTipText = objectMsg.name + "_" + objectMsg.id.ToString();
     }
 
 

@@ -23,13 +23,9 @@ public class ROSPublisherManager : MonoBehaviour
     {
         imageTarget = new GameObject("correctAxesImageTarget");
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/hololensWall");
-        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.WallMsg>("/assets");
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempResponse");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensObject");
-        wall = new RosMessageTypes.CustomedInterfaces.WallMsg();
-        VRLAsset = new RosMessageTypes.CustomedInterfaces.WallMsg();
         transformation = new RosMessageTypes.Geometry.TwistMsg();
     }
 
@@ -102,26 +98,6 @@ public class ROSPublisherManager : MonoBehaviour
         objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
         objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/hololensObject", objectMsg);
-    }
-
-    public void PublishWalls()
-    {
-        StartCoroutine(PublishWallsCoroutine());
-    }
-
-    private IEnumerator PublishWallsCoroutine()
-    {
-        int count = 0;
-        foreach (UnityEngine.Transform child in MapManager.mapParent.transform)
-        {
-            wall.name = $"wall{count}";
-            wall.position = new RosMessageTypes.Geometry.Vector3Msg(child.transform.position.x, child.transform.position.z, child.transform.position.y);
-            wall.rotation = new RosMessageTypes.Geometry.Vector3Msg(child.transform.eulerAngles.x, child.transform.eulerAngles.z, child.transform.eulerAngles.y);
-            wall.scale = new RosMessageTypes.Geometry.Vector3Msg(child.transform.localScale.x, child.transform.localScale.z, child.transform.localScale.y);
-            ros.Publish("/hololensWall", wall);
-            count++;
-            yield return new WaitForSeconds(0.2f);
-        }
     }
 
 
