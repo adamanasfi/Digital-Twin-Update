@@ -64,6 +64,7 @@ public class ManipulationManager : MonoBehaviour
         {
             MoveAxisConstraint moveConstraint = child.GetComponent<MoveAxisConstraint>(); 
             moveConstraint.ConstraintOnMovement = translationCombinedAxes;
+            moveConstraint.UseLocalSpaceForConstraint = true;
         }
     }
 }

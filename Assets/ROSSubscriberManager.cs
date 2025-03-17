@@ -105,7 +105,8 @@ public class ROSSubscriberManager : MonoBehaviour
         );
         Vector3 eulerRotation = receivedRotation.eulerAngles;
         Quaternion adjustedRotation = Quaternion.Euler(eulerRotation.x, eulerRotation.z, eulerRotation.y);
-        GameObject assetCAD = Instantiate(prefab, worldPose, adjustedRotation, PrefabsManager.STODParent.transform);
+        Quaternion worldRotation = ROSPublisherManager.imageTarget.transform.rotation * adjustedRotation;
+        GameObject assetCAD = Instantiate(prefab, worldPose, worldRotation, PrefabsManager.STODParent.transform);
         GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPose + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
