@@ -9718,7 +9718,7 @@ GameObject:
   - component: {fileID: 1237624273}
   - component: {fileID: 1237624272}
   - component: {fileID: 1237624271}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RedRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

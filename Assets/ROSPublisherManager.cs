@@ -50,7 +50,8 @@ public class ROSPublisherManager : MonoBehaviour
         GameObject parentObject = tooltip.transform.parent.gameObject;
         Vector3 worldPose = parentObject.transform.position;
         Vector3 localPose = imageTarget.transform.InverseTransformPoint(worldPose);
-        float y_angle = imageTarget.transform.eulerAngles.y - parentObject.transform.eulerAngles.y;
+        float y_angle = parentObject.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
+        if (parentObject.layer == 6) y_angle += 180;
         objectMsg.name = className;
         objectMsg.id = id;
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPose.x, localPose.z, localPose.y);
@@ -111,10 +112,15 @@ public class ROSPublisherManager : MonoBehaviour
         Vector3 globalPosition = asset.transform.position;
         Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
         float y_angle = asset.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
+        if (asset.layer == 6)
+        {
+            y_angle += 180;
+            Debug.Log("LAYER 6!");
+        }
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
         objectMsg.name = asset.name.ToString();
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
-        Quaternion rotation = Quaternion.Euler(0, 0, -y_angle);
+        Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
         objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
         objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/hololensObject", objectMsg);

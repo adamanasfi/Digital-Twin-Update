@@ -20,7 +20,7 @@ public class ROSSubscriberManager : MonoBehaviour
         ros = ROSConnection.GetOrCreateInstance();
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/objectLocations", objectLocationsCallback);
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempCount", tempCountsCallback);
-        ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/STOD", STODCallback);
+        ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensSTOD", hololensSTODCallback);
         objectLocationsDict = new Dictionary<string, Dictionary<int, RosMessageTypes.CustomedInterfaces.ObjectMsg>>();
         toolTipsDict = new Dictionary<string,Dictionary<int, GameObject>>();
         tempCountsDict = new Dictionary<string, int>();
@@ -92,7 +92,7 @@ public class ROSSubscriberManager : MonoBehaviour
     }
 
 
-    public void STODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
+    public void hololensSTODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
     {
         GameObject prefab = PrefabsManager.prefabDictionary[objectMsg.name];
         Vector3 localPose = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
@@ -104,6 +104,7 @@ public class ROSSubscriberManager : MonoBehaviour
             (float)objectMsg.pose.orientation.w
         );
         Vector3 eulerRotation = receivedRotation.eulerAngles;
+        if (prefab.layer == 6) eulerRotation.z -= 180; 
         Quaternion adjustedRotation = Quaternion.Euler(eulerRotation.x, eulerRotation.z, eulerRotation.y);
         Quaternion worldRotation = ROSPublisherManager.imageTarget.transform.rotation * adjustedRotation;
         GameObject assetCAD = Instantiate(prefab, worldPose, worldRotation, PrefabsManager.STODParent.transform);

@@ -55,6 +55,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedRobot Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 7942296244960786342, guid: ad507fa14144b344bb9fc323fc315cc7, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 9199261849990390558, guid: ad507fa14144b344bb9fc323fc315cc7, type: 3}
 --- !u!1 &1081273349736252204 stripped
