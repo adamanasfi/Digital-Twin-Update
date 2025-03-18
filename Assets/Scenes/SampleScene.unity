@@ -3236,12 +3236,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 428251492}
+    - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: publishHumanCorrectedObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ROSPublisherManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 1713058624}
+    - target: {fileID: 8579963257669363213, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8579963257894526767, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3999,11 +4015,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HuskyPrefab: {fileID: 919132149155446097, guid: f8f587d3d78ca894389364ff698ce4bd, type: 3}
-  MonitorEchoPrefab: {fileID: -7689171933294151993, guid: 0c90d9996c547aa47920e8c1a59eb052, type: 3}
-  RedChairPrefab: {fileID: -6080062899452486567, guid: bafd5cc96a2053c498653e1a3e9e3573, type: 3}
-  KubokiPrefab: {fileID: 1822912726896697443, guid: fc9edcf68dc8fdd41aab1b4ae6495d97, type: 3}
+  MonitorEchoPrefab: {fileID: 5149916640589998955, guid: 9aa702f85ffa9754e8e38aeb0d4f9541, type: 3}
+  RedChairPrefab: {fileID: 6884045764783566067, guid: 507259b5feaeded4b84718937df24b52, type: 3}
+  KubokiPrefab: {fileID: 8492907605611392371, guid: 41cd9f800d6c7e54790f761baeea9286, type: 3}
   RedRobotPrefab: {fileID: 1081273349736252204, guid: 0feb00f669ba56e4ca75b39bdf4be4e8, type: 3}
-  GreenChairPrefab: {fileID: 490678522412643297, guid: 98f03f36ad2428944938d23bc25e53a6, type: 3}
+  GreenChairPrefab: {fileID: 5837125131386228722, guid: cf20daaab12648f408fe5cb51608d8e7, type: 3}
   ToolTipPrefab: {fileID: 1713058624}
 --- !u!4 &507919880
 Transform:

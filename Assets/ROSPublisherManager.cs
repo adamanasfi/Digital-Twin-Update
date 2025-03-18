@@ -15,8 +15,6 @@ public class ROSPublisherManager : MonoBehaviour
     public GameObject ImageTarget;
     public static GameObject imageTarget;
     public GameObject vuforiaParent;
-    RosMessageTypes.CustomedInterfaces.WallMsg wall;
-    RosMessageTypes.CustomedInterfaces.WallMsg VRLAsset;
     RosMessageTypes.Geometry.TwistMsg transformation;
 
     void Start()
@@ -26,6 +24,7 @@ public class ROSPublisherManager : MonoBehaviour
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempResponse");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensObject");
+        ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/humanCorrection");
         transformation = new RosMessageTypes.Geometry.TwistMsg();
     }
 
@@ -38,6 +37,27 @@ public class ROSPublisherManager : MonoBehaviour
         int number = int.Parse(parts[1]);
         RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className,number);
         ros.Publish("/tempResponse", tempMsg);
+    }
+
+    public void publishHumanCorrectedObject(GameObject tooltip)
+    {
+        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
+        string text = tooltipText.ToolTipText;
+        string[] parts = text.Split('_');
+        string className = parts[0];
+        int id = int.Parse(parts[1]);
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        GameObject parentObject = tooltip.transform.parent.gameObject;
+        Vector3 worldPose = parentObject.transform.position;
+        Vector3 localPose = imageTarget.transform.InverseTransformPoint(worldPose);
+        float y_angle = imageTarget.transform.eulerAngles.y - parentObject.transform.eulerAngles.y;
+        objectMsg.name = className;
+        objectMsg.id = id;
+        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPose.x, localPose.z, localPose.y);
+        Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
+        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x, rotation.y, rotation.z, rotation.w);
+        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
+        ros.Publish("/humanCorrection",objectMsg);
     }
 
     private void CreateDebugCube(Vector3 position, Color color)
