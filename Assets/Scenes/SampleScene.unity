@@ -3198,7 +3198,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8554897599029637112, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8554897599029637112, guid: 2b37ab7e7555f20468665d12f6f72b0d, type: 3}
       propertyPath: m_Positions.Array.data[0].x
@@ -4052,11 +4052,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HuskyPrefab: {fileID: 919132149155446097, guid: f8f587d3d78ca894389364ff698ce4bd, type: 3}
-  MonitorEchoPrefab: {fileID: 5149916640589998955, guid: 9aa702f85ffa9754e8e38aeb0d4f9541, type: 3}
-  RedChairPrefab: {fileID: 6884045764783566067, guid: 507259b5feaeded4b84718937df24b52, type: 3}
-  KubokiPrefab: {fileID: 8492907605611392371, guid: 41cd9f800d6c7e54790f761baeea9286, type: 3}
-  RedRobotPrefab: {fileID: 1081273349736252204, guid: 0feb00f669ba56e4ca75b39bdf4be4e8, type: 3}
-  GreenChairPrefab: {fileID: 5837125131386228722, guid: cf20daaab12648f408fe5cb51608d8e7, type: 3}
+  MonitorEchoPrefab: {fileID: 2674614409982772760, guid: 5f29b9a7dc5e9ac4f85013bb3530607f, type: 3}
+  RedChairPrefab: {fileID: 7475343010369190713, guid: 7172dd58bd8429d4db5d4dad759d1b1e, type: 3}
+  KubokiPrefab: {fileID: 4475758639293216718, guid: f94bb2199d85fb742a32f18be90f2b0b, type: 3}
+  RedRobotPrefab: {fileID: 8722736001516648374, guid: 577ecb28db88f2b44910c9871dcf08f4, type: 3}
+  GreenChairPrefab: {fileID: 4204069269320229917, guid: 2b83dd5e0954a3440b0ee9e2fd2595cd, type: 3}
   ToolTipPrefab: {fileID: 1713058624}
 --- !u!4 &507919880
 Transform:
@@ -12788,7 +12788,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7acef0b79454c9b4dae3f8139bc4ba77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RosIPAddress: 10.90.193.15
+  m_RosIPAddress: 10.192.66.228
   m_RosPort: 10000
   m_ConnectOnStart: 1
   m_KeepaliveTime: 1
