@@ -9,10 +9,12 @@ using UnityEngine.UIElements;
 public class TextFieldManager : MonoBehaviour
 {
     public MRTKUGUIInputField ID;
+    public static MRTKUGUIInputField id;
 
     void Start()
     {
         ID.onEndEdit.AddListener(HandleIDEdit);
+        id = ID;
     }
 
     void OnEnable()

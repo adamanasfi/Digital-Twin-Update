@@ -51,7 +51,6 @@ public class ROSPublisherManager : MonoBehaviour
         Vector3 worldPose = parentObject.transform.position;
         Vector3 localPose = imageTarget.transform.InverseTransformPoint(worldPose);
         float y_angle = parentObject.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
-        if (parentObject.layer == 6) y_angle += 180;
         objectMsg.name = className;
         objectMsg.id = id;
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPose.x, localPose.z, localPose.y);
@@ -76,7 +75,7 @@ public class ROSPublisherManager : MonoBehaviour
         CreateDebugCube(robot.transform.position + robot.transform.forward * 1.0f, Color.blue);  // Forward (Z)
         CreateDebugCube(robot.transform.position + robot.transform.up * 1.0f, Color.green);      // Up (Y)
         CreateDebugCube(robot.transform.position + robot.transform.right * 1.0f, Color.red);     // Right (X)
-        float y_angle = imageTarget.transform.eulerAngles.y - robot.transform.eulerAngles.y;
+        float y_angle = robot.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
         transformation.linear.x = localPosition.x;
         transformation.linear.y = localPosition.z;
         transformation.linear.z = localPosition.y;
@@ -112,15 +111,18 @@ public class ROSPublisherManager : MonoBehaviour
         Vector3 globalPosition = asset.transform.position;
         Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
         float y_angle = asset.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
-        if (asset.layer == 6)
-        {
-            y_angle += 180;
-            Debug.Log("LAYER 6!");
-        }
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        if (asset.name == "Husky" || asset.name == "Kobuki")
+        {
+            objectMsg.id = int.Parse(TextFieldManager.id.text);
+            if (asset.name == "Kobuki") y_angle += 180;
+            CreateDebugCube(asset.transform.position + asset.transform.forward * 1.0f, Color.blue);  // Forward (Z)
+            CreateDebugCube(asset.transform.position + asset.transform.up * 1.0f, Color.green);      // Up (Y)
+            CreateDebugCube(asset.transform.position + asset.transform.right * 1.0f, Color.red);     // Right (X)
+        }
         objectMsg.name = asset.name.ToString();
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
-        Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
+        Quaternion rotation = Quaternion.Euler(0, 0, -y_angle);
         objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
         objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/hololensObject", objectMsg);

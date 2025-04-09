@@ -104,7 +104,6 @@ public class ROSSubscriberManager : MonoBehaviour
             (float)objectMsg.pose.orientation.w
         );
         Vector3 eulerRotation = receivedRotation.eulerAngles;
-        if (prefab.layer == 6) eulerRotation.z -= 180; 
         Quaternion adjustedRotation = Quaternion.Euler(eulerRotation.x, eulerRotation.z, eulerRotation.y);
         Quaternion worldRotation = ROSPublisherManager.imageTarget.transform.rotation * adjustedRotation;
         GameObject assetCAD = Instantiate(prefab, worldPose, worldRotation, PrefabsManager.STODParent.transform);
