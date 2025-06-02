@@ -14,6 +14,7 @@ public class ROSPublisherManager : MonoBehaviour
     int publishMessageFrequency = 1;
     public GameObject ImageTarget;
     public static GameObject imageTarget;
+    public bool detectedImage;
     public GameObject vuforiaParent;
     RosMessageTypes.Geometry.TwistMsg transformation;
 
@@ -26,6 +27,8 @@ public class ROSPublisherManager : MonoBehaviour
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensObject");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/humanCorrection");
         transformation = new RosMessageTypes.Geometry.TwistMsg();
+        detectedImage = false;
+        InvokeRepeating("PublishHoloLensTransform", 0, 0.5f);
     }
 
     public void publishOfflineObject(GameObject tooltip)
@@ -103,6 +106,7 @@ public class ROSPublisherManager : MonoBehaviour
         imageTarget.transform.up = ImageTarget.transform.forward;
         imageTarget.transform.right = ImageTarget.transform.right;
         imageTarget.transform.forward = -ImageTarget.transform.up;
+        detectedImage = true;
     }
 
 
@@ -124,6 +128,23 @@ public class ROSPublisherManager : MonoBehaviour
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
         Quaternion rotation = Quaternion.Euler(0, 0, -y_angle);
         objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
+        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
+        ros.Publish("/hololensObject", objectMsg);
+    }
+
+    public void PublishHoloLensTransform()
+    {
+        if (!detectedImage) return;
+        Vector3 localPosition = imageTarget.transform.InverseTransformPoint(Camera.main.transform.position);
+        float x_angle = imageTarget.transform.eulerAngles.x - Camera.main.transform.eulerAngles.x;
+        float y_angle = imageTarget.transform.eulerAngles.y - Camera.main.transform.eulerAngles.y;
+        float z_angle = imageTarget.transform.eulerAngles.z - Camera.main.transform.eulerAngles.z;
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        objectMsg.name = "HoloLens";
+        objectMsg.id = 1;
+        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
+        Quaternion rotation = Quaternion.Euler(-x_angle,-z_angle, y_angle);
+        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x, rotation.y, rotation.z, rotation.w);
         objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/hololensObject", objectMsg);
     }
