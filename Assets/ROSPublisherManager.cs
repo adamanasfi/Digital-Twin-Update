@@ -10,24 +10,15 @@ using Microsoft.MixedReality.Toolkit.UI;
 public class ROSPublisherManager : MonoBehaviour
 {
     ROSConnection ros;
-    float timeElapsed = 0.0f;
-    int publishMessageFrequency = 1;
-    public GameObject ImageTarget;
-    public static GameObject imageTarget;
-    public bool detectedImage;
     public GameObject vuforiaParent;
-    RosMessageTypes.Geometry.TwistMsg transformation;
 
     void Start()
     {
-        imageTarget = new GameObject("correctAxesImageTarget");
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<RosMessageTypes.Geometry.TwistMsg>("/transformation");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempResponse");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensObject");
         ros.RegisterPublisher<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/humanCorrection");
-        transformation = new RosMessageTypes.Geometry.TwistMsg();
-        detectedImage = false;
         //InvokeRepeating("PublishHoloLensTransform", 0, 0.5f);
     }
 
@@ -38,7 +29,7 @@ public class ROSPublisherManager : MonoBehaviour
         string[] parts = text.Split('_');
         string className = parts[0];
         int number = int.Parse(parts[1]);
-        RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className,number);
+        RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className, number);
         ros.Publish("/tempResponse", tempMsg);
     }
 
@@ -52,41 +43,19 @@ public class ROSPublisherManager : MonoBehaviour
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
         GameObject parentObject = tooltip.transform.parent.gameObject;
         Vector3 worldPose = parentObject.transform.position;
-        Vector3 localPose = imageTarget.transform.InverseTransformPoint(worldPose);
-        float y_angle = parentObject.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
+        Vector3 localPose = OriginManager.imageTarget.transform.InverseTransformPoint(worldPose);
+        float y_angle = parentObject.transform.eulerAngles.y - OriginManager.imageTarget.transform.eulerAngles.y;
         objectMsg.name = className;
         objectMsg.id = id;
         objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPose.x, localPose.z, localPose.y);
         Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
         objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x, rotation.y, rotation.z, rotation.w);
         objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
-        ros.Publish("/humanCorrection",objectMsg);
+        ros.Publish("/humanCorrection", objectMsg);
     }
 
-    private void CreateDebugCube(Vector3 position, Color color)
-    {
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.transform.position = position;
-        cube.transform.localScale = Vector3.one * 0.2f; // Set size to make it more visible
-        cube.GetComponent<Renderer>().material.color = color;
-    }
 
-    public void PublishTransform(GameObject robot)
-    {
-        Vector3 globalPosition = robot.transform.position;
-        Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
-        CreateDebugCube(robot.transform.position + robot.transform.forward * 1.0f, Color.blue);  // Forward (Z)
-        CreateDebugCube(robot.transform.position + robot.transform.up * 1.0f, Color.green);      // Up (Y)
-        CreateDebugCube(robot.transform.position + robot.transform.right * 1.0f, Color.red);     // Right (X)
-        float y_angle = robot.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
-        transformation.linear.x = localPosition.x;
-        transformation.linear.y = localPosition.z;
-        transformation.linear.z = localPosition.y;
-        transformation.angular.x = 0;
-        transformation.angular.y = 0;
-        transformation.angular.z = y_angle;
-        ros.Publish("/transformation", transformation);
-    }
+
 
     public void PublishActivatedModelTarget()
     {
@@ -100,49 +69,41 @@ public class ROSPublisherManager : MonoBehaviour
         }
     }
 
-    public void SaveImageTarget()
-    {
-        imageTarget.transform.position = ImageTarget.transform.position;
-        //imageTarget.transform.up = ImageTarget.transform.forward;
-        //imageTarget.transform.right = ImageTarget.transform.right;
-        //imageTarget.transform.forward = -ImageTarget.transform.up;
-        imageTarget.transform.rotation = ImageTarget.transform.rotation;
-        CreateDebugCube(imageTarget.transform.position + imageTarget.transform.forward * 1.0f, Color.blue);  // Forward (Z)
-        CreateDebugCube(imageTarget.transform.position + imageTarget.transform.up * 1.0f, Color.green);      // Up (Y)
-        CreateDebugCube(imageTarget.transform.position + imageTarget.transform.right * 1.0f, Color.red);     // Right (X)
-        detectedImage = true;
-    }
 
+
+    public RosMessageTypes.CustomedInterfaces.ObjectMsg FillObjectMessage(bool isOnlineObject, string name, Vector3 localPosition, float y_angle)
+    {
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        if (isOnlineObject) objectMsg.id = int.Parse(TextFieldManager.id.text);
+        objectMsg.name = name;
+        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
+        Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
+        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x, rotation.y, rotation.z, rotation.w);
+        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
+        return objectMsg;
+    }
 
     public void PublishAsset(GameObject asset)
     {
-        Vector3 globalPosition = asset.transform.position;
-        Vector3 localPosition = imageTarget.transform.InverseTransformPoint(globalPosition);
-        float y_angle = asset.transform.eulerAngles.y - imageTarget.transform.eulerAngles.y;
-        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
-        if (asset.name == "Husky" || asset.name == "Kobuki")
+        bool isOnlineObject = false;
+        Vector3 localPosition = OriginManager.CalculateLocalPosition(asset.transform.position);
+        float y_angle = OriginManager.CalculateLocalRotation(asset.transform.eulerAngles.y);
+        if (asset.layer == 6)
         {
-            objectMsg.id = int.Parse(TextFieldManager.id.text);
+            isOnlineObject = true;
             if (asset.name == "Kobuki") y_angle += 180;
-            CreateDebugCube(asset.transform.position + asset.transform.forward * 1.0f, Color.blue);  // Forward (Z)
-            CreateDebugCube(asset.transform.position + asset.transform.up * 1.0f, Color.green);      // Up (Y)
-            CreateDebugCube(asset.transform.position + asset.transform.right * 1.0f, Color.red);     // Right (X)
         }
-        objectMsg.name = asset.name.ToString();
-        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPosition.x, localPosition.z, localPosition.y);
-        Quaternion rotation = Quaternion.Euler(0, 0, -y_angle);
-        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x,rotation.y,rotation.z,rotation.w);
-        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = FillObjectMessage(isOnlineObject, asset.name.ToString(), localPosition, y_angle);
         ros.Publish("/hololensObject", objectMsg);
     }
 
     //public void PublishHoloLensTransform()
     //{
     //    if (!detectedImage) return;
-    //    Vector3 localPosition = imageTarget.transform.InverseTransformPoint(Camera.main.transform.position);
-    //    float x_angle = imageTarget.transform.eulerAngles.x - Camera.main.transform.eulerAngles.x;
-    //    float y_angle = imageTarget.transform.eulerAngles.y - Camera.main.transform.eulerAngles.y;
-    //    float z_angle = imageTarget.transform.eulerAngles.z - Camera.main.transform.eulerAngles.z;
+    //    Vector3 localPosition = OriginManager.imageTarget.transform.InverseTransformPoint(Camera.main.transform.position);
+    //    float x_angle = OriginManager.imageTarget.transform.eulerAngles.x - Camera.main.transform.eulerAngles.x;
+    //    float y_angle = OriginManager.imageTarget.transform.eulerAngles.y - Camera.main.transform.eulerAngles.y;
+    //    float z_angle = OriginManager.imageTarget.transform.eulerAngles.z - Camera.main.transform.eulerAngles.z;
     //    RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
     //    objectMsg.name = "HoloLens";
     //    objectMsg.id = 1;
@@ -157,6 +118,5 @@ public class ROSPublisherManager : MonoBehaviour
 
 
 }
-
 
 

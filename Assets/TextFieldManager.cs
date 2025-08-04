@@ -13,7 +13,6 @@ public class TextFieldManager : MonoBehaviour
 
     void Start()
     {
-        ID.onEndEdit.AddListener(HandleIDEdit);
         id = ID;
     }
 
@@ -23,11 +22,6 @@ public class TextFieldManager : MonoBehaviour
         ID.text = "";
         ID.transform.position = newPosition;
         ID.transform.forward = Camera.main.transform.forward;
-    }
-
-    void HandleIDEdit(string inputText)
-    {
-
     }
 
 }

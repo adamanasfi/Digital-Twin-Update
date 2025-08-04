@@ -74,7 +74,7 @@ public class ROSSubscriberManager : MonoBehaviour
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = objectLocationsDict[name][id];
         Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z + 1, (float)objectMsg.pose.position.y);
-        Vector3 worldPosition = ROSPublisherManager.imageTarget.transform.TransformPoint(localPosition);
+        Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
         GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPosition, Quaternion.identity);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
@@ -94,20 +94,19 @@ public class ROSSubscriberManager : MonoBehaviour
 
     public void hololensSTODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
     {
+        Debug.Log(objectMsg.name + objectMsg.id);
         GameObject prefab = PrefabsManager.prefabDictionary[objectMsg.name];
-        Vector3 localPose = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
-        Vector3 worldPose = ROSPublisherManager.imageTarget.transform.TransformPoint(localPose);
-        Quaternion receivedRotation = new Quaternion(
+        Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
+        Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
+        Quaternion localRotation = new Quaternion(
             (float)objectMsg.pose.orientation.x,
             (float)objectMsg.pose.orientation.y,
             (float)objectMsg.pose.orientation.z,
             (float)objectMsg.pose.orientation.w
         );
-        Vector3 eulerRotation = receivedRotation.eulerAngles;
-        Quaternion adjustedRotation = Quaternion.Euler(eulerRotation.x, eulerRotation.z, eulerRotation.y);
-        Quaternion worldRotation = ROSPublisherManager.imageTarget.transform.rotation * adjustedRotation;
-        GameObject assetCAD = Instantiate(prefab, worldPose, worldRotation, PrefabsManager.STODParent.transform);
-        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPose + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
+        Quaternion worldRotation = OriginManager.CalculateWorldRotation(localRotation);
+        GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, PrefabsManager.STODParent.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPosition + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         tooltipText.ToolTipText = objectMsg.name + "_" + objectMsg.id.ToString();

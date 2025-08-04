@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PrefabsManager : MonoBehaviour
 {
-    public GameObject HuskyPrefab, MonitorEchoPrefab, RedChairPrefab, KubokiPrefab, RedRobotPrefab, GreenChairPrefab;
+    public GameObject HuskyPrefab, MonitorEchoPrefab, RedChairPrefab, KubokiPrefab, RedRobotPrefab, GreenChairPrefab, BMWRobotPrefab;
     public GameObject ToolTipPrefab;
     public static Dictionary<string, GameObject> prefabDictionary;
     public static GameObject STODParent;
@@ -15,9 +15,10 @@ public class PrefabsManager : MonoBehaviour
             { "Husky", HuskyPrefab },
             { "MonitorEcho", MonitorEchoPrefab },
             { "RedChair", RedChairPrefab },
-            { "Kuboki", KubokiPrefab },
+            { "Kobuki", KubokiPrefab },
             { "RedRobot", RedRobotPrefab },
-            {"GreenChair", GreenChairPrefab }
+            {"GreenChair", GreenChairPrefab },
+            {"BMWRobot", BMWRobotPrefab }
         };
         STODParent = new GameObject("STODParent");
         toolTipPrefab = ToolTipPrefab;
