@@ -5,6 +5,8 @@ using TMPro;
 using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
+using System.Text.RegularExpressions;
+
 
 
 public class ROSPublisherManager : MonoBehaviour
@@ -26,10 +28,10 @@ public class ROSPublisherManager : MonoBehaviour
     {
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         string text = tooltipText.ToolTipText;
-        string[] parts = text.Split('_');
-        string className = parts[0];
-        int number = int.Parse(parts[1]);
-        RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className, number);
+        Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
+        string className = match.Groups[1].Value;
+        int id = int.Parse(match.Groups[2].Value);
+        RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className, id);
         ros.Publish("/tempResponse", tempMsg);
     }
 
@@ -37,21 +39,17 @@ public class ROSPublisherManager : MonoBehaviour
     {
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         string text = tooltipText.ToolTipText;
-        string[] parts = text.Split('_');
-        string className = parts[0];
-        int id = int.Parse(parts[1]);
-        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
+        string className = match.Groups[1].Value;
+        int id = int.Parse(match.Groups[2].Value);
+        Debug.Log(className);
         GameObject parentObject = tooltip.transform.parent.gameObject;
-        Vector3 worldPose = parentObject.transform.position;
-        Vector3 localPose = OriginManager.imageTarget.transform.InverseTransformPoint(worldPose);
-        float y_angle = parentObject.transform.eulerAngles.y - OriginManager.imageTarget.transform.eulerAngles.y;
-        objectMsg.name = className;
+        Vector3 localPosition = OriginManager.CalculateLocalPosition(parentObject.transform.position);
+        float y_angle = OriginManager.CalculateLocalRotation(parentObject.transform.eulerAngles.y);
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = FillObjectMessage(false,className,localPosition,y_angle);
         objectMsg.id = id;
-        objectMsg.pose.position = new RosMessageTypes.Geometry.PointMsg(localPose.x, localPose.z, localPose.y);
-        Quaternion rotation = Quaternion.Euler(0, 0, y_angle);
-        objectMsg.pose.orientation = new RosMessageTypes.Geometry.QuaternionMsg(rotation.x, rotation.y, rotation.z, rotation.w);
-        objectMsg.scale = new RosMessageTypes.Geometry.Vector3Msg(1, 1, 1);
         ros.Publish("/humanCorrection", objectMsg);
+        if (PrefabsManager.STODParent.transform.childCount > 0) ROSClientManager.CallSTODService();
     }
 
 
@@ -95,6 +93,7 @@ public class ROSPublisherManager : MonoBehaviour
         }
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = FillObjectMessage(isOnlineObject, asset.name.ToString(), localPosition, y_angle);
         ros.Publish("/hololensObject", objectMsg);
+        if (PrefabsManager.STODParent.transform.childCount > 0) ROSClientManager.CallSTODService();
     }
 
     //public void PublishHoloLensTransform()

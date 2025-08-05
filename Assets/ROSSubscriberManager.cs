@@ -51,7 +51,7 @@ public class ROSSubscriberManager : MonoBehaviour
             if (tempCountsDict[objectMsg.name] != 0)
             {
                 Debug.Log("Temp Count is: " + tempCountsDict[objectMsg.name]);
-                AddToolTip(objectMsg.name, objectMsg.id);
+                AddTempToolTip(objectMsg.name, objectMsg.id);
             }
         } 
     }
@@ -70,15 +70,15 @@ public class ROSSubscriberManager : MonoBehaviour
         }
     }
 
-    private void AddToolTip(string name, int id) 
+    private void AddTempToolTip(string name, int id) 
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = objectLocationsDict[name][id];
         Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z + 1, (float)objectMsg.pose.position.y);
         Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
-        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPosition, Quaternion.identity);
+        GameObject tooltip = Instantiate(PrefabsManager.temptoolTipPrefab, worldPosition, Quaternion.identity, PrefabsManager.TempParent.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
-        tooltipText.ToolTipText = name + "_" + id.ToString();
+        tooltipText.ToolTipText = "Is " + name + "_" + id.ToString() + "still here?";
         if (!toolTipsDict.ContainsKey(name)) toolTipsDict.Add(name, new Dictionary<int, GameObject>());
         if (!toolTipsDict[name].ContainsKey(id))
         {
@@ -94,7 +94,6 @@ public class ROSSubscriberManager : MonoBehaviour
 
     public void hololensSTODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
     {
-        Debug.Log(objectMsg.name + objectMsg.id);
         GameObject prefab = PrefabsManager.prefabDictionary[objectMsg.name];
         Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
         Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
@@ -106,10 +105,10 @@ public class ROSSubscriberManager : MonoBehaviour
         );
         Quaternion worldRotation = OriginManager.CalculateWorldRotation(localRotation);
         GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, PrefabsManager.STODParent.transform);
-        GameObject tooltip = Instantiate(PrefabsManager.toolTipPrefab, worldPosition + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.humanCorrectionToolTipPrefab, worldPosition + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
-        tooltipText.ToolTipText = objectMsg.name + "_" + objectMsg.id.ToString();
+        tooltipText.ToolTipText = "Change " + objectMsg.name + "_" + objectMsg.id.ToString() + " pose?";
     }
 
 

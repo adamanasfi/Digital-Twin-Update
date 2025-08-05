@@ -4,10 +4,10 @@ using UnityEngine;
 public class PrefabsManager : MonoBehaviour
 {
     public GameObject HuskyPrefab, MonitorEchoPrefab, RedChairPrefab, KubokiPrefab, RedRobotPrefab, GreenChairPrefab, BMWRobotPrefab;
-    public GameObject ToolTipPrefab;
+    public GameObject TempToolTipPrefab, HumanCorrectionToolTipPrefab, EditObjectsToolTipPrefab;
     public static Dictionary<string, GameObject> prefabDictionary;
-    public static GameObject STODParent;
-    public static GameObject toolTipPrefab;
+    public static GameObject STODParent, TempParent;
+    public static GameObject temptoolTipPrefab, humanCorrectionToolTipPrefab, editObjectsToolTipPrefab;
     void Start()
     {
         prefabDictionary = new Dictionary<string, GameObject>
@@ -21,6 +21,19 @@ public class PrefabsManager : MonoBehaviour
             {"BMWRobot", BMWRobotPrefab }
         };
         STODParent = new GameObject("STODParent");
-        toolTipPrefab = ToolTipPrefab;
+        TempParent = new GameObject("TempParent");
+        temptoolTipPrefab = TempToolTipPrefab;
+        humanCorrectionToolTipPrefab = HumanCorrectionToolTipPrefab;
+        editObjectsToolTipPrefab = EditObjectsToolTipPrefab;
+    }
+
+    public static void SetSTODParentState(bool state)
+    {
+        STODParent.SetActive(state);
+    }
+
+    public static void SetTempParentState(bool state)
+    {
+        TempParent.SetActive(state);
     }
 }

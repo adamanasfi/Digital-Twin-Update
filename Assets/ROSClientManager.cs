@@ -4,7 +4,7 @@ using RosMessageTypes.CustomedInterfaces;
 
 public class ROSClientManager : MonoBehaviour
 {
-    ROSConnection ros;
+    public static ROSConnection ros;
 
     void Start()
     {
@@ -12,8 +12,13 @@ public class ROSClientManager : MonoBehaviour
         ros.RegisterRosService<RequestSTODRequest, RequestSTODResponse>("request_STOD");
     }
 
-    public void CallSTODService()
+    public static void CallSTODService()
     {
+        for (int i = PrefabsManager.STODParent.transform.childCount - 1; i >= 0; i--)
+        {
+            Transform child = PrefabsManager.STODParent.transform.GetChild(i);
+            GameObject.Destroy(child.gameObject);
+        }
         RequestSTODRequest request = new RequestSTODRequest
         {
             agent_name = "hololens"
@@ -22,7 +27,7 @@ public class ROSClientManager : MonoBehaviour
         ros.SendServiceMessage<RequestSTODResponse>("request_STOD", request, STODResponseCallback);
     }
 
-    void STODResponseCallback(RequestSTODResponse response)
+    static void STODResponseCallback(RequestSTODResponse response)
     {
         if (response.success)
         {
