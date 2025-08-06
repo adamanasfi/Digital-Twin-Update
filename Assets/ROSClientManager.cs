@@ -14,9 +14,9 @@ public class ROSClientManager : MonoBehaviour
 
     public static void CallSTODService()
     {
-        for (int i = PrefabsManager.STODParent.transform.childCount - 1; i >= 0; i--)
+        for (int i = PrefabsManager.stodParent.transform.childCount - 1; i >= 0; i--)
         {
-            Transform child = PrefabsManager.STODParent.transform.GetChild(i);
+            Transform child = PrefabsManager.stodParent.transform.GetChild(i);
             GameObject.Destroy(child.gameObject);
         }
         RequestSTODRequest request = new RequestSTODRequest

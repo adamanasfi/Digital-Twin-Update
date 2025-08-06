@@ -51,15 +51,27 @@ public class ROSSubscriberManager : MonoBehaviour
             if (tempCountsDict[objectMsg.name] != 0)
             {
                 Debug.Log("Temp Count is: " + tempCountsDict[objectMsg.name]);
-                AddTempToolTip(objectMsg.name, objectMsg.id);
+                AddIsHereToolTip(objectMsg.name, objectMsg.id);
             }
         } 
     }
 
     public void tempCountsCallback(RosMessageTypes.CustomedInterfaces.TempMsg tempMsg)
     {
+        int oldCount;
         if (!tempCountsDict.ContainsKey(tempMsg.name)) tempCountsDict.Add(tempMsg.name, tempMsg.number); // class doesn't exist in dictionary 
-        else tempCountsDict[tempMsg.name] = tempMsg.number;
+        else 
+        {
+            oldCount = tempCountsDict[tempMsg.name];
+            tempCountsDict[tempMsg.name] = tempMsg.number;
+            if (tempMsg.number < oldCount)
+            {
+                // delete last added temp tooltip
+                string className = tempMsg.name;
+                Transform classToolTipsParent = PrefabsManager.tempParent.transform.Find(className);
+                if (classToolTipsParent != null) Destroy(classToolTipsParent.transform.GetChild(classToolTipsParent.transform.childCount - 1).gameObject);
+            }
+        }
         if (tempMsg.number == 0)
         {         
             foreach (GameObject tooltip in toolTipsDict[tempMsg.name].Values)
@@ -68,17 +80,48 @@ public class ROSSubscriberManager : MonoBehaviour
             }
             if (toolTipsDict.ContainsKey(tempMsg.name)) toolTipsDict[tempMsg.name].Clear();
         }
+        else
+        {
+            if (ROSPublisherManager.shouldAddTemp)
+            {
+                foreach (Transform child in PrefabsManager.vuforiaParent.transform)
+                {
+                    if (child.gameObject.activeSelf)
+                    {
+                        string className = child.gameObject.name;
+                        Vector3 worldPosition = child.transform.position;
+                        Transform classToolTipsParent = PrefabsManager.tempParent.transform.Find(className);
+                        if (classToolTipsParent == null)
+                        {
+                            GameObject parent = new GameObject(className);
+                            parent.transform.SetParent(PrefabsManager.tempParent.transform);
+                            classToolTipsParent = parent.transform;
+                        }
+                        GameObject tempToolTip = Instantiate(
+                            PrefabsManager.tempToolTipPrefab,
+                            worldPosition + new Vector3(0,1,0),
+                            Quaternion.identity,
+                            classToolTipsParent
+                        );
+                        tempToolTip.SetActive(true);
+                        ToolTip tooltipText = tempToolTip.GetComponent<ToolTip>();
+                        tooltipText.ToolTipText = "Which " + className + "?";
+                        break;
+                    }
+                }
+            }
+        }
     }
 
-    private void AddTempToolTip(string name, int id) 
+    private void AddIsHereToolTip(string name, int id) 
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = objectLocationsDict[name][id];
         Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z + 1, (float)objectMsg.pose.position.y);
         Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
-        GameObject tooltip = Instantiate(PrefabsManager.temptoolTipPrefab, worldPosition, Quaternion.identity, PrefabsManager.TempParent.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.ishereToolTipPrefab, worldPosition, Quaternion.identity, PrefabsManager.isHereParent.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
-        tooltipText.ToolTipText = "Is " + name + "_" + id.ToString() + "still here?";
+        tooltipText.ToolTipText = "Is " + name + "_" + id.ToString() + " still here?";
         if (!toolTipsDict.ContainsKey(name)) toolTipsDict.Add(name, new Dictionary<int, GameObject>());
         if (!toolTipsDict[name].ContainsKey(id))
         {
@@ -104,7 +147,7 @@ public class ROSSubscriberManager : MonoBehaviour
             (float)objectMsg.pose.orientation.w
         );
         Quaternion worldRotation = OriginManager.CalculateWorldRotation(localRotation);
-        GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, PrefabsManager.STODParent.transform);
+        GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, PrefabsManager.stodParent.transform);
         GameObject tooltip = Instantiate(PrefabsManager.humanCorrectionToolTipPrefab, worldPosition + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();

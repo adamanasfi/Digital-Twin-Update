@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 public class ROSPublisherManager : MonoBehaviour
 {
     ROSConnection ros;
-    public GameObject vuforiaParent;
+    public static bool shouldAddTemp = false;
 
     void Start()
     {
@@ -26,6 +26,7 @@ public class ROSPublisherManager : MonoBehaviour
 
     public void publishOfflineObject(GameObject tooltip)
     {
+        shouldAddTemp = false;
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         string text = tooltipText.ToolTipText;
         Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
@@ -49,7 +50,7 @@ public class ROSPublisherManager : MonoBehaviour
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = FillObjectMessage(false,className,localPosition,y_angle);
         objectMsg.id = id;
         ros.Publish("/humanCorrection", objectMsg);
-        if (PrefabsManager.STODParent.transform.childCount > 0) ROSClientManager.CallSTODService();
+        if (PrefabsManager.stodParent.transform.childCount > 0) ROSClientManager.CallSTODService();
     }
 
 
@@ -57,7 +58,7 @@ public class ROSPublisherManager : MonoBehaviour
 
     public void PublishActivatedModelTarget()
     {
-        foreach (UnityEngine.Transform child in vuforiaParent.transform)
+        foreach (UnityEngine.Transform child in PrefabsManager.vuforiaParent.transform)
         {
             if (child.gameObject.activeSelf)
             {
@@ -83,6 +84,7 @@ public class ROSPublisherManager : MonoBehaviour
 
     public void PublishAsset(GameObject asset)
     {
+        shouldAddTemp = true;
         bool isOnlineObject = false;
         Vector3 localPosition = OriginManager.CalculateLocalPosition(asset.transform.position);
         float y_angle = OriginManager.CalculateLocalRotation(asset.transform.eulerAngles.y);
@@ -93,7 +95,7 @@ public class ROSPublisherManager : MonoBehaviour
         }
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = FillObjectMessage(isOnlineObject, asset.name.ToString(), localPosition, y_angle);
         ros.Publish("/hololensObject", objectMsg);
-        if (PrefabsManager.STODParent.transform.childCount > 0) ROSClientManager.CallSTODService();
+        if (PrefabsManager.stodParent.transform.childCount > 0) ROSClientManager.CallSTODService();
     }
 
     //public void PublishHoloLensTransform()

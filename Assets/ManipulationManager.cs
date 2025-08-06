@@ -40,7 +40,7 @@ public class ManipulationManager : MonoBehaviour
         {
             rotationCombinedAxes &= ~AxisFlags.YAxis;
         }
-        foreach (Transform child in PrefabsManager.STODParent.transform)
+        foreach (Transform child in PrefabsManager.stodParent.transform)
         {
             RotationAxisConstraint rotationConstraint = child.GetComponent<RotationAxisConstraint>();
             rotationConstraint.ConstraintOnRotation = rotationCombinedAxes;
@@ -60,7 +60,7 @@ public class ManipulationManager : MonoBehaviour
             translationCombinedAxes &= ~axis;
         }
 
-        foreach (Transform child in PrefabsManager.STODParent.transform)
+        foreach (Transform child in PrefabsManager.stodParent.transform)
         {
             MoveAxisConstraint moveConstraint = child.GetComponent<MoveAxisConstraint>(); 
             moveConstraint.ConstraintOnMovement = translationCombinedAxes;
