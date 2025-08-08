@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.UI;
+
 
 public class PrefabsManager : MonoBehaviour
 {
@@ -57,4 +60,13 @@ public class PrefabsManager : MonoBehaviour
         GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, parent.transform);
         return assetCAD;
     }
+
+    public static Match ExtractObjectFromTooltip(GameObject tooltip)
+    {
+        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
+        string text = tooltipText.ToolTipText;
+        Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
+        return match;
+    }
+
 }

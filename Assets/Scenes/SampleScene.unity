@@ -3905,7 +3905,7 @@ GameObject:
   - component: {fileID: 362837497}
   - component: {fileID: 362837496}
   m_Layer: 0
-  m_Name: Red Robot
+  m_Name: RedRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18599,7 +18599,7 @@ GameObject:
   - component: {fileID: 1220295849}
   - component: {fileID: 1220295848}
   m_Layer: 0
-  m_Name: Green Chair
+  m_Name: GreenChair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24159,7 +24159,7 @@ GameObject:
   - component: {fileID: 1480264979}
   - component: {fileID: 1480264978}
   m_Layer: 0
-  m_Name: Monitor Echo
+  m_Name: MonitorEcho
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27316,7 +27316,7 @@ GameObject:
   - component: {fileID: 1655917005}
   - component: {fileID: 1655917004}
   m_Layer: 0
-  m_Name: BMW Robot
+  m_Name: BMWRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41148,9 +41148,29 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 428251492}
+      objectReference: {fileID: 843269994}
+    - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CallDeleteService
+      objectReference: {fileID: 0}
+    - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ROSClientManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 8579918471760910755}
+    - target: {fileID: 3752354765382980853, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3752354765382980854, guid: 0ddd86d546b91f5418b57180804b9904, type: 3}
       propertyPath: mainLabelText
       value: 

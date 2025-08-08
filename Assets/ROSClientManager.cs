@@ -1,16 +1,20 @@
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.CustomedInterfaces;
+using System.Text.RegularExpressions;
+
 
 public class ROSClientManager : MonoBehaviour
 {
     public static ROSConnection ros;
+    public static string requestedCategory;
 
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterRosService<RequestSTODRequest, RequestSTODResponse>("request_STOD");
         ros.RegisterRosService<RequestCategoryRequest, RequestCategoryResponse>("request_category");
+        ros.RegisterRosService<EditObjectsRequest, EditObjectsResponse>("edit_objects");
     }
 
     public static void CallSTODService()
@@ -40,10 +44,24 @@ public class ROSClientManager : MonoBehaviour
         }
     }
 
-    public void CallCategoryService(GameObject requestedCategory)
+    public void CallCategoryService(GameObject requestedClass)
     {
-        RequestCategoryRequest request = new RequestCategoryRequest(requestedCategory.name);
+        requestedCategory = requestedClass.name;
+        RequestCategoryRequest request = new RequestCategoryRequest(requestedCategory);
         ros.SendServiceMessage<RequestCategoryResponse>("request_category", request, CategoryResponseCallback);
+    }
+
+    public static void CallDeleteService(GameObject tooltip)
+    {
+        Match match = PrefabsManager.ExtractObjectFromTooltip(tooltip);
+        string className = match.Groups[1].Value;
+        int id = int.Parse(match.Groups[2].Value);
+        RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
+        objectMsg.name = className;
+        objectMsg.id = id;
+        EditObjectsRequest request = new EditObjectsRequest("delete", objectMsg);
+        ros.SendServiceMessage<EditObjectsResponse>("edit_objects", request, EditResponseCallBack);
+        Destroy(tooltip.transform.parent.gameObject);
     }
 
     void CategoryResponseCallback(RequestCategoryResponse response)
@@ -55,6 +73,18 @@ public class ROSClientManager : MonoBehaviour
         else
         {
             Debug.Log("Category request failed.");
+        }
+    }
+
+    static void EditResponseCallBack(EditObjectsResponse response)
+    {
+        if (response.success)
+        {
+            Debug.Log("Edit request was successful!");
+        }
+        else
+        {
+            Debug.Log("Edit request failed.");
         }
     }
 

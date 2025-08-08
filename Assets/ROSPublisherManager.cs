@@ -27,9 +27,7 @@ public class ROSPublisherManager : MonoBehaviour
     public void publishOfflineObject(GameObject tooltip)
     {
         shouldAddTemp = false;
-        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
-        string text = tooltipText.ToolTipText;
-        Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
+        Match match = PrefabsManager.ExtractObjectFromTooltip(tooltip);
         string className = match.Groups[1].Value;
         int id = int.Parse(match.Groups[2].Value);
         RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className, id);
@@ -38,12 +36,9 @@ public class ROSPublisherManager : MonoBehaviour
 
     public void publishHumanCorrectedObject(GameObject tooltip)
     {
-        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
-        string text = tooltipText.ToolTipText;
-        Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
+        Match match = PrefabsManager.ExtractObjectFromTooltip(tooltip);
         string className = match.Groups[1].Value;
         int id = int.Parse(match.Groups[2].Value);
-        Debug.Log(className);
         GameObject parentObject = tooltip.transform.parent.gameObject;
         Vector3 localPosition = OriginManager.CalculateLocalPosition(parentObject.transform.position);
         float y_angle = OriginManager.CalculateLocalRotation(parentObject.transform.eulerAngles.y);
