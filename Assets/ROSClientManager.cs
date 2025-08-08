@@ -10,6 +10,7 @@ public class ROSClientManager : MonoBehaviour
     {
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterRosService<RequestSTODRequest, RequestSTODResponse>("request_STOD");
+        ros.RegisterRosService<RequestCategoryRequest, RequestCategoryResponse>("request_category");
     }
 
     public static void CallSTODService()
@@ -36,6 +37,24 @@ public class ROSClientManager : MonoBehaviour
         else
         {
             Debug.Log("STOD request failed.");
+        }
+    }
+
+    public void CallCategoryService(GameObject requestedCategory)
+    {
+        RequestCategoryRequest request = new RequestCategoryRequest(requestedCategory.name);
+        ros.SendServiceMessage<RequestCategoryResponse>("request_category", request, CategoryResponseCallback);
+    }
+
+    void CategoryResponseCallback(RequestCategoryResponse response)
+    {
+        if (response.success)
+        {
+            Debug.Log("Category request was successful!");
+        }
+        else
+        {
+            Debug.Log("Category request failed.");
         }
     }
 

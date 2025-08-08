@@ -21,6 +21,7 @@ public class ROSSubscriberManager : MonoBehaviour
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/objectLocations", objectLocationsCallback);
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.TempMsg>("/tempCount", tempCountsCallback);
         ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/hololensSTOD", hololensSTODCallback);
+        ros.Subscribe<RosMessageTypes.CustomedInterfaces.ObjectMsg>("/categorySTOD", categorySTODCallback);
         objectLocationsDict = new Dictionary<string, Dictionary<int, RosMessageTypes.CustomedInterfaces.ObjectMsg>>();
         toolTipsDict = new Dictionary<string,Dictionary<int, GameObject>>();
         tempCountsDict = new Dictionary<string, int>();
@@ -137,25 +138,27 @@ public class ROSSubscriberManager : MonoBehaviour
 
     public void hololensSTODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
     {
-        GameObject prefab = PrefabsManager.prefabDictionary[objectMsg.name];
-        Vector3 localPosition = new Vector3((float)objectMsg.pose.position.x, (float)objectMsg.pose.position.z, (float)objectMsg.pose.position.y);
-        Vector3 worldPosition = OriginManager.CalculateWorldPosition(localPosition);
-        Quaternion localRotation = new Quaternion(
-            (float)objectMsg.pose.orientation.x,
-            (float)objectMsg.pose.orientation.y,
-            (float)objectMsg.pose.orientation.z,
-            (float)objectMsg.pose.orientation.w
-        );
-        Quaternion worldRotation = OriginManager.CalculateWorldRotation(localRotation);
-        GameObject assetCAD = Instantiate(prefab, worldPosition, worldRotation, PrefabsManager.stodParent.transform);
-        GameObject tooltip = Instantiate(PrefabsManager.humanCorrectionToolTipPrefab, worldPosition + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
+        GameObject assetCAD = PrefabsManager.DrawCAD(objectMsg, PrefabsManager.stodParent.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.humanCorrectionToolTipPrefab, assetCAD.transform.position + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
         tooltip.SetActive(true);
         ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
         tooltipText.ToolTipText = "Change " + objectMsg.name + "_" + objectMsg.id.ToString() + " pose?";
     }
 
 
-    
+    public void categorySTODCallback(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg)
+    {
+        GameObject assetCAD = PrefabsManager.DrawCAD(objectMsg, PrefabsManager.editParent.transform);
+        GameObject tooltip = Instantiate(PrefabsManager.editObjectsToolTipPrefab, assetCAD.transform.position + new Vector3(0, 1, 0), Quaternion.identity, assetCAD.transform);
+        tooltip.SetActive(true);
+        ToolTip tooltipText = tooltip.GetComponent<ToolTip>();
+        tooltipText.ToolTipText = "Delete " + objectMsg.name + "_" + objectMsg.id.ToString() + "?";
+    }
+
+
+
+
+
 
 
 
