@@ -63,6 +63,7 @@ public class ROSClientManager : MonoBehaviour
         EditObjectsRequest request = new EditObjectsRequest("delete", objectMsg);
         ros.SendServiceMessage<EditObjectsResponse>("edit_objects", request, EditResponseCallBack);
         Destroy(tooltip.transform.parent.gameObject);
+        PrefabsManager.ClearEditCADs();
     }
 
     public static void CallAddService()
