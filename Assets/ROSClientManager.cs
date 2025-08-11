@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.CustomedInterfaces;
 using System.Text.RegularExpressions;
+using UnityEditor.VersionControl;
 
 
 public class ROSClientManager : MonoBehaviour
@@ -62,6 +63,23 @@ public class ROSClientManager : MonoBehaviour
         EditObjectsRequest request = new EditObjectsRequest("delete", objectMsg);
         ros.SendServiceMessage<EditObjectsResponse>("edit_objects", request, EditResponseCallBack);
         Destroy(tooltip.transform.parent.gameObject);
+    }
+
+    public static void CallAddService()
+    {
+        foreach (UnityEngine.Transform child in PrefabsManager.vuforiaParent.transform)
+        {
+            if (child.gameObject.activeSelf)
+            {
+                Vector3 localPosition = OriginManager.CalculateLocalPosition(child.transform.position);
+                float y_angle = OriginManager.CalculateLocalRotation(child.transform.eulerAngles.y);
+                RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = ROSPublisherManager.FillObjectMessage(false, child.name.ToString(), localPosition, y_angle);
+                EditObjectsRequest request = new EditObjectsRequest("add", objectMsg);
+                ros.SendServiceMessage<EditObjectsResponse>("edit_objects", request, EditResponseCallBack);
+                break;
+            }
+        }
+        PrefabsManager.ClearEditCADs();
     }
 
     void CategoryResponseCallback(RequestCategoryResponse response)

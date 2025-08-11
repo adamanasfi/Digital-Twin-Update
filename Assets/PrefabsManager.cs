@@ -45,6 +45,11 @@ public class PrefabsManager : MonoBehaviour
         isHereParent.SetActive(state);
     }
 
+    public static void SetEditParentState(bool state)
+    {
+        editParent.SetActive(state);
+    }   
+
     public static GameObject DrawCAD(RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg, Transform parent)
     {
         GameObject prefab = prefabDictionary[objectMsg.name];
@@ -68,5 +73,14 @@ public class PrefabsManager : MonoBehaviour
         Match match = Regex.Match(text, @"([A-Za-z0-9]+)_([0-9]+)");
         return match;
     }
+
+    public static void ClearEditCADs()
+    {
+        foreach (Transform child in editParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }   
+
 
 }

@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 public class ROSPublisherManager : MonoBehaviour
 {
-    ROSConnection ros;
+    public ROSConnection ros;
     public static bool shouldAddTemp = false;
 
     void Start()
@@ -65,7 +65,7 @@ public class ROSPublisherManager : MonoBehaviour
 
 
 
-    public RosMessageTypes.CustomedInterfaces.ObjectMsg FillObjectMessage(bool isOnlineObject, string name, Vector3 localPosition, float y_angle)
+    public static RosMessageTypes.CustomedInterfaces.ObjectMsg FillObjectMessage(bool isOnlineObject, string name, Vector3 localPosition, float y_angle)
     {
         RosMessageTypes.CustomedInterfaces.ObjectMsg objectMsg = new RosMessageTypes.CustomedInterfaces.ObjectMsg();
         if (isOnlineObject) objectMsg.id = int.Parse(TextFieldManager.id.text);
