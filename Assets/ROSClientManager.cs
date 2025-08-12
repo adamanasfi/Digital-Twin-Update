@@ -2,7 +2,6 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.CustomedInterfaces;
 using System.Text.RegularExpressions;
-using UnityEditor.VersionControl;
 
 
 public class ROSClientManager : MonoBehaviour
@@ -45,9 +44,14 @@ public class ROSClientManager : MonoBehaviour
         }
     }
 
-    public void CallCategoryService(GameObject requestedClass)
+    public void CallCategoryService(GameObject requestedClass) // user entered edit mode
     {
-        requestedCategory = requestedClass.name;
+        CallCategoryService(requestedClass.name);
+    }
+
+    public static void CallCategoryService(string requestedClass) // user entered edit mode
+    {
+        requestedCategory = requestedClass;
         RequestCategoryRequest request = new RequestCategoryRequest(requestedCategory);
         ros.SendServiceMessage<RequestCategoryResponse>("request_category", request, CategoryResponseCallback);
     }
@@ -83,7 +87,7 @@ public class ROSClientManager : MonoBehaviour
         PrefabsManager.ClearEditCADs();
     }
 
-    void CategoryResponseCallback(RequestCategoryResponse response)
+    static void CategoryResponseCallback(RequestCategoryResponse response)
     {
         if (response.success)
         {

@@ -32,6 +32,11 @@ public class ROSPublisherManager : MonoBehaviour
         int id = int.Parse(match.Groups[2].Value);
         RosMessageTypes.CustomedInterfaces.TempMsg tempMsg = new RosMessageTypes.CustomedInterfaces.TempMsg(className, id);
         ros.Publish("/tempResponse", tempMsg);
+        if (PrefabsManager.editParent.transform.childCount > 0 && className == ROSClientManager.requestedCategory)
+        {
+            PrefabsManager.ClearEditCADs();
+            ROSClientManager.CallCategoryService(className);
+        }
     }
 
     public void publishHumanCorrectedObject(GameObject tooltip)
